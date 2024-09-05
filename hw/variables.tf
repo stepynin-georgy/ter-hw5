@@ -27,3 +27,27 @@ variable "ssh-authorized-keys" {
   type        = list(string)
   default     = ["~/.ssh/id_ed25519.pub"]
 }
+
+variable "ip_address" {
+  type        = string
+  description = "ip-адрес"
+  default = "192.168.0.1"
+
+  validation {
+    condition     = can(regex("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", var.ip_address))
+    error_message = "Неверный IP-адрес."
+  }
+}
+
+variable "ip_addresses" {
+  type        = list(string)
+  description = "список ip-адресов"
+  default     = ["192.168.0.1", "1.1.1.1", "127.0.0.1"]
+
+  validation {
+    condition = alltrue([
+      for address in var.ip_addresses : can(regex("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", address))
+    ])
+    error_message = "Один или несколько адресов в списке неверны."
+  }
+}
