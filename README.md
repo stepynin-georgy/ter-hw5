@@ -30,6 +30,17 @@
 - из [ДЗ к лекции 4](https://github.com/netology-code/ter-homeworks/tree/main/04/src),
 - из [демо к лекции 4](https://github.com/netology-code/ter-homeworks/tree/main/04/demonstration1).
 2. Проверьте код с помощью tflint и checkov. Вам не нужно инициализировать этот проект.
+
+Для ДЗ к лекции 4 проверил с помощью tflint:
+
+![изображение](https://github.com/stepynin-georgy/ter-hw5/blob/main/hw/img/Screenshot_154.png)
+
+Для демо к лекции 4 проверил с помощью checkov:
+
+![изображение](https://github.com/stepynin-georgy/ter-hw5/blob/main/hw/img/Screenshot_155.png)
+![изображение](https://github.com/stepynin-georgy/ter-hw5/blob/main/hw/img/Screenshot_156.png)
+![изображение](https://github.com/stepynin-georgy/ter-hw5/blob/main/hw/img/Screenshot_157.png)
+  
 3. Перечислите, какие **типы** ошибок обнаружены в проекте (без дублей).
 
 ------
@@ -37,11 +48,44 @@
 ### Задание 2
 
 1. Возьмите ваш GitHub-репозиторий с **выполненным ДЗ 4** в ветке 'terraform-04' и сделайте из него ветку 'terraform-05'.
+
+[terraform-05](https://github.com/stepynin-georgy/ter-hw5/tree/terraform-05)
+
 2. Повторите демонстрацию лекции: настройте YDB, S3 bucket, yandex service account, права доступа и мигрируйте state проекта в S3 с блокировками. Предоставьте скриншоты процесса в качестве ответа.
+
+- Создаем бакет:
+    - В yc заходим в Object Storage
+    - Нажимаем Новый бакет
+    - Указываем уникальное глобально среди всех бакетов имя. Было указано tfstate-developer
+    - Указываем предельный бесплатный предел занимаемого пространства - 1Гб
+
+![изображение](https://github.com/stepynin-georgy/ter-hw5/blob/main/hw/img/Screenshot_158.png)
+
+- Создаем таблицу блокировок
+    - Создаем БД ydb. Заходим в Managed Services for YDB и нажимаем Создать базу данных. Указываем имя БД - tfstate-develop. Задаем максимальный бесплатный размер БД - 1Гб
+ 
+    ![изображение](https://github.com/stepynin-georgy/ter-hw5/blob/main/hw/img/Screenshot_159.png)
+
+    - В списке БД нажимаем по названию БД и проваливаемся внутрь БД.
+    - Выбираем слева пункт меню Навигация
+    - Нажимаем кнопку Создать и в выпадающем списке команд выбираем Таблица (можно еще создать Директории и Потоки данных)
+    - Задаем название таблицы(например tfstate-locks) и выбираем тип таблицы - Документальная(в отличие от строковой таблицы каждая запись может иметь свой собственный набор атрибутов, но также имеет уникальный идентификатор)
+    - Указываем один столбец - LockID типа строка
+ 
+    ![изображение](https://github.com/stepynin-georgy/ter-hw5/blob/main/hw/img/Screenshot_160.png)
+
+
+
+- Назначаем акканту права на бакет
+    - В списке бакетов нажимаем рядом с бакетом на троеточие и в выпадающем списке выбираем команду ACL бакета
+    - Появится диалоговое окно где выбираем аккаунт и задаем ему права Read And Write
+
 3. Закоммитьте в ветку 'terraform-05' все изменения.
 4. Откройте в проекте terraform console, а в другом окне из этой же директории попробуйте запустить terraform apply.
 5. Пришлите ответ об ошибке доступа к state.
 6. Принудительно разблокируйте state. Пришлите команду и вывод.
+
+
 
 
 ------
