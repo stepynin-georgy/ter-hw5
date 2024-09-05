@@ -59,7 +59,7 @@
     - Указываем уникальное глобально среди всех бакетов имя. Было указано tfstate-developer
     - Указываем предельный бесплатный предел занимаемого пространства - 1Гб
 
-![изображение](https://github.com/stepynin-georgy/ter-hw5/blob/main/hw/img/Screenshot_158.png)
+    ![изображение](https://github.com/stepynin-georgy/ter-hw5/blob/main/hw/img/Screenshot_158.png)
 
 - Создаем таблицу блокировок
     - Создаем БД ydb. Заходим в Managed Services for YDB и нажимаем Создать базу данных. Указываем имя БД - tfstate-develop. Задаем максимальный бесплатный размер БД - 1Гб
@@ -74,36 +74,90 @@
  
     ![изображение](https://github.com/stepynin-georgy/ter-hw5/blob/main/hw/img/Screenshot_160.png)
 
-
-
 - Назначаем акканту права на бакет
     - В списке бакетов нажимаем рядом с бакетом на троеточие и в выпадающем списке выбираем команду ACL бакета
     - Появится диалоговое окно где выбираем аккаунт и задаем ему права Read And Write
 
+    ![изображение](https://github.com/stepynin-georgy/ter-hw5/blob/main/hw/img/Screenshot_163.png)
+
 3. Закоммитьте в ветку 'terraform-05' все изменения.
 4. Откройте в проекте terraform console, а в другом окне из этой же директории попробуйте запустить terraform apply.
 5. Пришлите ответ об ошибке доступа к state.
+
+![изображение](https://github.com/stepynin-georgy/ter-hw5/blob/main/hw/img/Screenshot_164.png)
+
 6. Принудительно разблокируйте state. Пришлите команду и вывод.
 
-
+Получилось разблокировать state следующей командой: ```root@terraform-hw4:/opt/hw5/ter-hw5/hw# terraform apply -lock=false```
 
 
 ------
 ### Задание 3  
 
 1. Сделайте в GitHub из ветки 'terraform-05' новую ветку 'terraform-hotfix'.
+
+[terraform-hotfix](https://github.com/stepynin-georgy/ter-hw5/tree/terraform-hotfix)
+
 2. Проверье код с помощью tflint и checkov, исправьте все предупреждения и ошибки в 'terraform-hotfix', сделайте коммит.
+
+![изображение](https://github.com/stepynin-georgy/ter-hw5/blob/main/hw/img/Screenshot_167.png)
+
+![изображение](https://github.com/stepynin-georgy/ter-hw5/blob/main/hw/img/Screenshot_168.png)
+
+После исправления ошибок:
+
+![изображение](https://github.com/stepynin-georgy/ter-hw5/blob/main/hw/img/Screenshot_168.png)
+
 3. Откройте новый pull request 'terraform-hotfix' --> 'terraform-05'. 
 4. Вставьте в комментарий PR результат анализа tflint и checkov, план изменений инфраструктуры из вывода команды terraform plan.
 5. Пришлите ссылку на PR для ревью. Вливать код в 'terraform-05' не нужно.
+
+[pull-request](https://github.com/stepynin-georgy/ter-hw5/pull/1) с комментариями
 
 ------
 ### Задание 4
 
 1. Напишите переменные с валидацией и протестируйте их, заполнив default верными и неверными значениями. Предоставьте скриншоты проверок из terraform console. 
 
+Добавил следующие переменные:
+
+```
+variable "ip_address" {
+  type        = string
+  description = "ip-адрес"
+  default = "192.168.0.1"
+
+  validation {
+    condition     = can(regex("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", var.ip_address))
+    error_message = "Неверный IP-адрес."
+  }
+}
+
+variable "ip_addresses" {
+  type        = list(string)
+  description = "список ip-адресов"
+  default     = ["192.168.0.1", "1.1.1.1", "127.0.0.1"]
+
+  validation {
+    condition = alltrue([
+      for address in var.ip_addresses : can(regex("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", address))
+    ])
+    error_message = "Один или несколько адресов в списке неверны."
+  }
+}
+```
+
 - type=string, description="ip-адрес" — проверка, что значение переменной содержит верный IP-адрес с помощью функций cidrhost() или regex(). Тесты:  "192.168.0.1" и "1920.1680.0.1";
+
+При корректных значениях:
+
+![изображение](https://github.com/stepynin-georgy/ter-hw5/blob/main/hw/img/Screenshot_173.png)
+
 - type=list(string), description="список ip-адресов" — проверка, что все адреса верны. Тесты:  ["192.168.0.1", "1.1.1.1", "127.0.0.1"] и ["192.168.0.1", "1.1.1.1", "1270.0.0.1"].
+
+При некорректных значениях:
+
+![изображение](https://github.com/stepynin-georgy/ter-hw5/blob/main/hw/img/Screenshot_172.png)
 
 ## Дополнительные задания (со звёздочкой*)
 
